@@ -11,6 +11,8 @@ function Validator(options) {
     // Lấy ra các rules của selector
     const rules = selectorRules[rule.selector];
 
+    console.log(rules);
+
     // Lặp qua từng rule & kiểm tra
     // Nếu có lỗi thì dừng việc kiểm tra
     for (let i = 0; i < rules.length; i++) {
@@ -23,8 +25,9 @@ function Validator(options) {
           break;
         default:
           errorMessage = rules[i](inputElement.value);
+          console.log(errorMessage);
       }
-      if (errorElement) break;
+      if (errorMessage) break;
     }
 
     if (errorMessage) {
@@ -137,6 +140,12 @@ function Validator(options) {
             errorElement.innerText = "";
             parentElement.classList.remove("invalid");
           };
+
+          if (inputElement.type === "select-one") {
+            inputElement.onchange = () => {
+              validate(inputElement, rule);
+            };
+          }
         }
       });
     });
@@ -181,8 +190,8 @@ Validator.minLength = function (selector, min, message) {
 
 Validator.isConfirmed = function (selector, getConfirmValue, message) {
   return {
-    selector: selector,
-    test: function (value) {
+    selector,
+    test: (value) => {
       return value === getConfirmValue()
         ? undefined
         : message || "Giá trị nhập vào không chính xác";
